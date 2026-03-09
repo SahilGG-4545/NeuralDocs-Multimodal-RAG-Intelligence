@@ -19,6 +19,20 @@
 
 **NeuralDocs** is a production-ready **multimodal Retrieval-Augmented Generation (RAG)** system that understands both text and images within PDF documents. Built with state-of-the-art AI models, it enables natural language querying across complex documents containing charts, diagrams, and mixed content.
 
+<table>
+<tr>
+<td><img src="https://github.com/user-attachments/assets/58e690c7-c59f-4425-b5c7-54ef35bd733d" width="400"/></td>
+<td><img src="https://github.com/user-attachments/assets/da195258-320b-444e-a6e3-f7a878d2fc85" width="400"/></td>
+</tr>
+
+<tr>
+<td><img src="https://github.com/user-attachments/assets/8bd1e062-3f7d-4340-84c6-01bcc08bca6a" width="400"/></td>
+<td><img src="https://github.com/user-attachments/assets/a3efb31d-dd84-4682-9cbc-cb6a1e61afcc" width="400"/></td>
+</tr>
+</table>
+
+
+
 ### 🎯 Key Highlights
 
 - **🔍 Multimodal Understanding** — Unified semantic search across text and images using OpenAI CLIP embeddings
@@ -268,3 +282,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Built with ❤️ for intelligent document understanding**
 
 [⭐ Star this repo](https://github.com/SahilGG-4545/NeuralDocs-Multimodal-RAG-Intelligence) 
+
