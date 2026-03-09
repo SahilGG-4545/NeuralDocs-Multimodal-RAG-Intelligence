@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuralDocs — Multimodal RAG Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+<div class="grid-overlay"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- ── NAV ────────────────────────────────────────────────── -->
+<nav id="nav">
+  <a class="nav-logo" href="#">
+    <div class="logo-mark">🧠</div>
+    NeuralDocs
+  </a>
+  <ul class="nav-links">
+    <li><a href="#upload">Upload</a></li>
+    <li><a href="#query">Query</a></li>
+    <li><a href="#features">Features</a></li>
+  </ul>
+  <div class="status-pill" id="status-pill" onclick="checkHealth()">
+    <div class="sdot" id="sdot"></div>
+    <span id="stext">Checking…</span>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ── HERO ──────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <div class="eyebrow-dot"></div>
+      Multimodal RAG Intelligence
+    </div>
+    <h1 class="hero-title">
+      Query Documents with<br>
+      <span class="grad-text">AI Vision &amp; Language</span>
+    </h1>
+    <p class="hero-lead">
+      Upload any PDF. Ask questions in plain English. Get intelligent answers
+      powered by <strong>CLIP multimodal embeddings</strong> and <strong>Llama 4</strong> —
+      understanding both text <em>and</em> images.
+    </p>
+    <div class="hero-cta">
+      <a href="#upload" class="btn btn-primary">📂 &nbsp;Upload Document</a>
+      <a href="#query"  class="btn btn-ghost">🔍 &nbsp;Start Querying</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-val" id="stat-docs">—</div>
+        <div class="stat-lbl">Chunks Indexed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-vs">—</div>
+        <div class="stat-lbl">Vector Store</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">CLIP</div>
+        <div class="stat-lbl">Embeddings</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">Llama 4</div>
+        <div class="stat-lbl">Language Model</div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll to explore</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ── Pipeline visual ───────────────────────────────────── -->
+  <div class="container" style="padding-bottom:5rem;">
+    <div class="pipeline reveal">
+      <div class="pipe-step">
+        <div class="pipe-icon">📄</div>
+        <div class="pipe-name">PDF Ingest</div>
+        <div class="pipe-desc">Text + Images</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">👁️</div>
+        <div class="pipe-name">CLIP Embed</div>
+        <div class="pipe-desc">512-d vectors</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🗄️</div>
+        <div class="pipe-name">FAISS Index</div>
+        <div class="pipe-desc">ANN search</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🔍</div>
+        <div class="pipe-name">Rerank</div>
+        <div class="pipe-desc">Cosine sim</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🦙</div>
+        <div class="pipe-name">Llama 4</div>
+        <div class="pipe-desc">MoE answer</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container"><div class="divider"></div></div>
+
+  <!-- ── UPLOAD ────────────────────────────────────────────── -->
+  <section class="s" id="upload">
+    <div class="container">
+      <div class="s-head reveal">
+        <div class="s-tag">Step 1</div>
+        <h2 class="s-title">Upload Your Documents</h2>
+        <p class="s-desc">Drag &amp; drop PDF files to index their text and embedded images via CLIP.</p>
+      </div>
+      <div class="reveal">
+        <div class="drop-zone" id="drop-zone">
+          <div class="dz-icon">📄</div>
+          <div class="dz-title">Drop PDF files here</div>
+          <div class="dz-desc">or click to browse &nbsp;·&nbsp; PDF only &nbsp;·&nbsp; Max 50 MB</div>
+          <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('file-input').click()">
+            Choose File
+          </button>
+          <input type="file" id="file-input" accept=".pdf" multiple />
+        </div>
+        <div class="file-list" id="file-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="divider"></div></div>
+
+  <!-- ── QUERY ─────────────────────────────────────────────── -->
+  <section class="s" id="query">
+    <div class="container">
+      <div class="s-head reveal">
+        <div class="s-tag">Step 2</div>
+        <h2 class="s-title">Ask Your Question</h2>
+        <p class="s-desc">Query across text and images with natural language. Press Enter or click send.</p>
+      </div>
+
+      <div class="reveal">
+        <div class="q-wrap">
+          <textarea
+            class="q-input" id="q-input" rows="3"
+            placeholder="e.g. 'What does the revenue chart show?' or 'Summarize the key findings…'"
+          ></textarea>
+          <button class="q-send" id="q-btn" onclick="submitQuery()" title="Send (Enter)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 2L11 13M22 2L15 22 11 13 2 9l20-7z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="setQ(this)">📊 What does the chart show?</span>
+          <span class="chip" onclick="setQ(this)">📝 Summarize the document</span>
+          <span class="chip" onclick="setQ(this)">🔍 What are the key findings?</span>
+          <span class="chip" onclick="setQ(this)">📈 Describe the data trends</span>
+          <span class="chip" onclick="setQ(this)">🖼️ Describe any images present</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading card" id="loading" style="margin-top:1.5rem;">
+        <div class="spinner"></div>
+        <div class="loading-lbl">Processing query<span class="dots"></span></div>
+        <div style="font-size:.72rem;color:var(--text-m);margin-top:.4rem;">Embed → Retrieve → Generate</div>
+      </div>
+
+      <!-- Response -->
+      <div class="card resp-card" id="resp-card">
+        <div class="resp-head">
+          <div class="resp-title">
+            🤖 &nbsp;AI Response
+            <span class="type-badge badge-txt" id="q-type-badge">text</span>
+          </div>
+          <button class="copy-btn" onclick="copyResp()">Copy</button>
+        </div>
+        <div class="resp-body" id="resp-body"></div>
+        <div class="lat-row">
+          <div class="lat-item"><div class="lat-val" id="l-emb">—</div><div class="lat-lbl">Embedding</div></div>
+          <div class="lat-item"><div class="lat-val" id="l-ret">—</div><div class="lat-lbl">Retrieval</div></div>
+          <div class="lat-item"><div class="lat-val" id="l-llm">—</div><div class="lat-lbl">LLM</div></div>
+          <div class="lat-item"><div class="lat-val" id="l-tot">—</div><div class="lat-lbl">Total</div></div>
+        </div>
+      </div>
+
+      <!-- Sources -->
+      <div class="sources-wrap" id="sources-wrap">
+        <div class="src-divider">Retrieved Sources</div>
+        <div class="src-grid" id="src-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="divider"></div></div>
+
+  <!-- ── FEATURES ──────────────────────────────────────────── -->
+  <section class="s" id="features">
+    <div class="container">
+      <div class="s-head reveal">
+        <div class="s-tag">Capabilities</div>
+        <h2 class="s-title">Built for Intelligence</h2>
+        <p class="s-desc">A production-ready multimodal RAG pipeline combining vision and language.</p>
+      </div>
+      <div class="feat-grid">
+        <div class="card feat-card reveal">
+          <div class="feat-icon">👁️</div>
+          <div class="feat-title">CLIP Multimodal Embeddings</div>
+          <div class="feat-desc">OpenAI CLIP encodes text and images into the same 512-d vector space for unified semantic search.</div>
+        </div>
+        <div class="card feat-card reveal" style="transition-delay:.1s">
+          <div class="feat-icon">🔍</div>
+          <div class="feat-title">Two-Stage Retrieval</div>
+          <div class="feat-desc">FAISS ANN search followed by cosine similarity reranking extracts the most relevant chunks.</div>
+        </div>
+        <div class="card feat-card reveal" style="transition-delay:.2s">
+          <div class="feat-icon">🦙</div>
+          <div class="feat-title">Llama 4 Scout</div>
+          <div class="feat-desc">Meta's Llama 4 Scout 17B–16E MoE model via Groq delivers fast, high-quality multimodal answers.</div>
+        </div>
+        <div class="card feat-card reveal" style="transition-delay:.3s">
+          <div class="feat-icon">📄</div>
+          <div class="feat-title">Full PDF Extraction</div>
+          <div class="feat-desc">PyMuPDF extracts chunked text and embedded raster images for complete document coverage.</div>
+        </div>
+        <div class="card feat-card reveal" style="transition-delay:.4s">
+          <div class="feat-icon">⚡</div>
+          <div class="feat-title">Smart Query Classification</div>
+          <div class="feat-desc">Automatically detects visual vs. text queries and adjusts retrieval strategy for best results.</div>
+        </div>
+        <div class="card feat-card reveal" style="transition-delay:.5s">
+          <div class="feat-icon">📊</div>
+          <div class="feat-title">Latency Telemetry</div>
+          <div class="feat-desc">Every response includes embedding, retrieval and LLM timings for full pipeline observability.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-brand">NeuralDocs</div>
+  <div>Multimodal RAG &nbsp;·&nbsp; CLIP + Llama 4 + FAISS &nbsp;·&nbsp; Flask</div>
+</footer>
+
+<div id="toasts"></div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
